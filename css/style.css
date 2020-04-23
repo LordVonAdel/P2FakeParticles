@@ -1,0 +1,79 @@
+:root {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: sans-serif;
+  padding: 0px;
+  margin: 0px;
+  overflow: hidden;
+  color: white;
+  background-color: #202020;
+}
+
+input {
+  display: block;
+  width: 100%;
+}
+
+.main {
+  margin: 0px;
+  padding: 0px;
+  height: 100vh; /* @todo Subtract menu bar height */
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+}
+
+.tools, .preview {
+  height: 100%;
+  margin: 0px;
+  background: #202020;
+  padding: 3px;
+  display: inline-block;
+  position: absolute;
+}
+
+.tools {
+  top: 0;
+  left: 0;
+  width: 30%;
+  height: 100%;
+  padding: 5px;
+  overflow-y: auto;
+}
+
+.preview {
+  top: 0;
+  left: 30%;
+  width: 70%;
+  height: 100%;
+}
+
+label {
+  display: block;
+}
+
+.layer2 {
+  border: 1px solid black;
+  padding-top: 3px;
+  padding-bottom: 3px;
+  background: rgba(0, 0, 0, 0.3);
+}
+
+.group-item {
+  padding: 3px;
+  cursor: pointer;
+}
+
+.group-item:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.group-item.selected {
+  background: rgba(255, 255, 255, 0.4);
+}
+
+canvas:focus {
+  outline: none;
+}

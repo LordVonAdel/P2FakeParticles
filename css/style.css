@@ -9,6 +9,7 @@ body {
   overflow: hidden;
   color: white;
   background-color: #202020;
+  user-select: none;
 }
 
 input {
@@ -52,6 +53,7 @@ input {
 
 label {
   display: block;
+  margin-top: 3px;
 }
 
 .layer2 {
@@ -76,4 +78,42 @@ label {
 
 canvas:focus {
   outline: none;
+}
+
+#log-view {
+  display: none;
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  right: 0px;
+  bottom: 0px;
+  background: rgba(0, 0, 0, 0.8);
+  color: white;
+  font-family: monospace;
+  user-select: text;
+  backdrop-filter: blur(4px);
+  overflow: auto;
+}
+
+.log-title::before {
+  content: "> ";
+}
+
+.log-title {
+  margin-top: 8px;
+  margin-bottom: 2px;
+  font-style: italic;
+}
+
+::-webkit-scrollbar {
+  width: 1em;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.1);
+}
+ 
+::-webkit-scrollbar-thumb {
+  background-color: darkgrey;
+  outline: 1px solid slategrey;
 }

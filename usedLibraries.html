@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Used Libraries</title>
+  </head>
+  <body>
+    This tool uses following libraries:
+    <div id="lib-list"></div>
+
+    <script>
+      const fs = require("fs");
+      const Path = require("path");
+
+      let list = document.getElementById("lib-list");
+      fs.readdir("node_modules", (err, files) => {
+          
+        for (let filename of files) {
+          if (filename.startsWith(".") || filename.startsWith("@")) continue;
+
+          let div = document.createElement("div");
+          div.appendChild(document.createElement("hr"));
+
+          let title = document.createElement("h3");
+          title.innerText = filename;
+          div.appendChild(title);
+
+          let license = document.createElement("pre");
+          div.appendChild(license);
+          
+          list.appendChild(div);
+          
+          fs.readFile(Path.join("node_modules", filename, "package.json"), (err, data) => {
+            if (err) return;
+            let json = JSON.parse(data);
+
+            title.innerText = json.name;
+            if (json.author) {
+              if (typeof json.author == "object") {
+                title.innerText += " by " + json.author.name;
+              } else {
+                title.innerText += " by " + json.author;
+              }
+            }
+
+            title.innerText += " (version " + json.version + ")";
+
+            if (license.innerText == "") {
+              license.innerText = json.license;
+            }
+          });
+
+          fs.readFile(Path.join("node_modules", filename, "license.txt"), (err, data) => {
+            if (err) return;
+            license.innerText = data;
+          });
+
+          fs.readFile(Path.join("node_modules", filename, "license"), (err, data) => {
+            if (err) return;
+            license.innerText = data;
+          });
+
+          fs.readFile(Path.join("node_modules", filename, "LICENCE"), (err, data) => {
+            if (err) return;
+            license.innerText = data;
+          });
+        }
+      });
+    </script>
+  </body>
+</html>

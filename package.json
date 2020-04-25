@@ -7,13 +7,14 @@
     "start": "electron ."
   },
   "author": "LordVonAdel",
-  "license": "ISC",
+  "license": "GPL",
   "devDependencies": {
     "electron": "^8.2.3"
   },
   "dependencies": {
-    "source-smd": "0.0.2",
+    "pngjs": "^5.0.0",
+    "source-smd": "0.0.4",
     "three": "^0.115.0",
-    "vtflib": "^1.0.1"
+    "vtf": "0.0.3"
   }
 }

@@ -1,12 +1,16 @@
 const ParticleDefinition = require("./ParticleDefinition.js");
 const { ipcRenderer, remote } = require('electron');
 const fs = require("fs");
+const Exporter = require('./Exporter.js');
 
 class Editor {
 
   constructor() {
     this.inputs = {};
     this.preview = null;
+    this.exporter = new Exporter(this);
+
+    this.logDiv = document.getElementById("log-view");
 
     let generalDiv = document.getElementById("general");
     generalDiv.appendChild(this.createInput("text", "Model Name", "model-name"));
@@ -22,27 +26,30 @@ class Editor {
       this.preview.updateScene();
     });
 
-    this.groupDiv = document.getElementById("group-div")
+    this.groupDiv = document.getElementById("group-div");
     let groupToolsDiv = document.getElementById("group-tools");
 
     groupToolsDiv.appendChild(this.createLabel("Appearance"));
-    groupToolsDiv.appendChild(this.createInput("file", "Texture", "texture"));
-    groupToolsDiv.appendChild(this.createInput("number", "Particle Number", "particle-number"));
+    let textureButton = document.createElement("button");
+    textureButton.innerText = "Pick Texture";
+    textureButton.addEventListener("click", () => this.pickTexture());
+    groupToolsDiv.appendChild(textureButton);
+    groupToolsDiv.appendChild(this.createInput("number", "Particle Number", "number"));
     groupToolsDiv.appendChild(this.createInputVector("Initial Scale", "scale"));
 
     groupToolsDiv.appendChild(this.createLabel("Position"));
     groupToolsDiv.appendChild(this.createInputVector("Emitter Dimensions", "emitter-dim"));
     groupToolsDiv.appendChild(this.createInputVector("Initial Speed", "speed-init"));
     groupToolsDiv.appendChild(this.createInputVector("Acceleration", "speed-acc"));
-    groupToolsDiv.appendChild(this.createInput("number", "Random Movement Scale", "random-movement"));
     
     groupToolsDiv.appendChild(this.createLabel("Angle (Degree)"));
     groupToolsDiv.appendChild(this.createInputVector("Start Angle", "angle"));
     groupToolsDiv.appendChild(this.createInputVector("Angle Speed", "angle-speed"));
     groupToolsDiv.appendChild(this.createInputVector("Angle Acceleration", "angle-acc"));
-    groupToolsDiv.appendChild(this.createInput("number", "Random Angle Scale", "random-angle"));
+    groupToolsDiv.appendChild(this.createInputVector("Random Angle", "angle-random"));
 
     groupToolsDiv.addEventListener("change", () => {
+      // Stupid big block could be replaced by adding event listener on the single inputs at createInput()
       this.selectedGroup.emitterDimensions[0] = this.inputs["emitter-dim-x"].value;
       this.selectedGroup.emitterDimensions[1] = this.inputs["emitter-dim-y"].value;
       this.selectedGroup.emitterDimensions[2] = this.inputs["emitter-dim-z"].value;
@@ -64,9 +71,9 @@ class Editor {
       this.selectedGroup.angleAcc[0] = this.inputs["angle-acc-x"].value;
       this.selectedGroup.angleAcc[1] = this.inputs["angle-acc-y"].value;
       this.selectedGroup.angleAcc[2] = this.inputs["angle-acc-z"].value;
-      this.selectedGroup.number = this.inputs["particle-number"].value;
-      this.selectedGroup.randomAngle = this.inputs["random-angle"].value;
-      this.selectedGroup.randomMove = this.inputs["random-movement"].value;
+      this.selectedGroup.angleRandom[0] = this.inputs["angle-random-x"].value;
+      this.selectedGroup.angleRandom[1] = this.inputs["angle-random-y"].value;
+      this.selectedGroup.angleRandom[2] = this.inputs["angle-random-z"].value;
       this.preview.updateScene();
     });
 
@@ -79,7 +86,8 @@ class Editor {
     });
 
     document.getElementById("btn-group-delete").addEventListener("click", () => {
-      if (this.definition.groups.length < 1) return;
+      if (this.definition.groups.length < 1) return; // Should not happen, because the button is disabled before removing the last group possible
+      this.selectedGroup.dispose();
       this.definition.groups.splice(this.selectedGroupIndex, 1);
       this.selectGroup(0);
     });
@@ -114,6 +122,26 @@ class Editor {
         if (!filename || filename.length == 0) return;
         this.openP2fp(filename[0]);
       });
+    });
+
+    ipcRenderer.on("export", () => {
+      remote.dialog.showSaveDialog(remote.getCurrentWindow(), {
+        title: "Export to SMD",
+        filters: [
+          { name: "JSON", extensions: ['smd'] }, // Portal 2 Fake Particle
+        ],
+        defaultPath: this.definition.name
+      }, filename => {
+        if (!filename) return;
+        console.log("Exporting to ", filename);
+        this.exporter.export(this.definition, filename);
+      });
+    });
+
+    document.addEventListener("keydown", e => {
+      if (e.code == "Escape") {
+        this.closeCompileLog();
+      }
     });
 
   }
@@ -172,6 +200,8 @@ class Editor {
     this.selectedGroupIndex = index;
     this.selectedGroup = this.definition.getGroups()[index];
     this.updateGroupsDisplay();
+
+    // This mess could be removed by replacing it with an itteration over this.inputs and using the right parameter keys
     this.inputs["emitter-dim-x"].value = this.selectedGroup.emitterDimensions[0];
     this.inputs["emitter-dim-y"].value = this.selectedGroup.emitterDimensions[1];
     this.inputs["emitter-dim-z"].value = this.selectedGroup.emitterDimensions[2];
@@ -193,9 +223,10 @@ class Editor {
     this.inputs["angle-speed-x"].value = this.selectedGroup.angleSpeed[0];
     this.inputs["angle-speed-y"].value = this.selectedGroup.angleSpeed[1];
     this.inputs["angle-speed-z"].value = this.selectedGroup.angleSpeed[2];
-    this.inputs["particle-number"].value = this.selectedGroup.number;
-    this.inputs["random-angle"].value = this.selectedGroup.randomAngle;
-    this.inputs["random-movement"].value = this.selectedGroup.randomMove;
+    this.inputs["angle-random-x"].value = this.selectedGroup.angleRandom[0];
+    this.inputs["angle-random-y"].value = this.selectedGroup.angleRandom[1];
+    this.inputs["angle-random-z"].value = this.selectedGroup.angleRandom[2];
+    this.inputs["number"].value = this.selectedGroup.number;
   }
 
   createInputVector(label, property) {
@@ -231,6 +262,12 @@ class Editor {
     input.id = "in-" + property;
     input.name = property;
     this.inputs[input.name] = input;
+
+    input.addEventListener("change", () => {
+      this.selectedGroup[property] = input.value;
+      this.preview.updateScene();
+    });
+
     return div;
   }
 
@@ -238,6 +275,40 @@ class Editor {
     let label = document.createElement("h3");
     label.innerText = text;
     return label;
+  }
+
+  pickTexture() {
+    remote.dialog.showOpenDialog(remote.getCurrentWindow(), {
+      title: "Open Texture",
+      filters: [
+        { name: "PNG", extensions: ['png'] },
+      ]
+    }, filename => {
+      if (!filename || filename.length == 0) return;
+      this.selectedGroup.texture = filename[0];
+      this.preview.updateScene();
+    });
+  }
+
+  startCompileLog() {
+    this.logDiv.style.display = "block";
+    this.logDiv.innerHTML = "";
+  }
+
+  compileLog(title, text, color = "white") {
+    let div1 = document.createElement("div");
+    div1.innerText = title;
+    div1.classList.add("log-title")
+    this.logDiv.appendChild(div1);
+
+    let div2 = document.createElement("div");
+    div2.innerText = text;
+    div2.style.color = color;
+    this.logDiv.appendChild(div2);
+  }
+
+  closeCompileLog() {
+    this.logDiv.style.display = "";
   }
 
 }

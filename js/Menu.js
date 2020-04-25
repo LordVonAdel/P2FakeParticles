@@ -1,6 +1,6 @@
 const { Menu } = require('electron');
  
-module.exports = function(window) {
+module.exports = function(window, showLibs) {
   return Menu.buildFromTemplate([
     {
       label: 'File',
@@ -25,10 +25,10 @@ module.exports = function(window) {
         },
         { type: 'separator' },
         {
-          label: "Export SMD"
-          /**
-           * @todo Implement SMD Export
-           */
+          label: "Export",
+          click() {
+            window.webContents.send("export");
+          }
         },
         { type: 'separator' },
         { role: 'quit' },
@@ -52,8 +52,12 @@ module.exports = function(window) {
           label: 'GitHub',
           click: async () => {
             const { shell } = require('electron');
-            await shell.openExternal('https://electronjs.org');
+            await shell.openExternal('https://github.com/LordVonAdel/P2FakeParticles');
           }
+        },
+        {
+          label: "Used libraries",
+          click: showLibs
         }
       ]
     }

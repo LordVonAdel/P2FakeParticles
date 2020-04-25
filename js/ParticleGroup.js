@@ -1,10 +1,12 @@
+const textureLoader = new THREE.TextureLoader();
+
 class ParticleGroup {
 
   /**
    * @todo Implement materials
    */
 
-  constructor(definition) {
+  constructor() {
     this.emitterDimensions = [1, 1, 1];
     this.number = 20; // Number of simultaneously existing particles
     this.material = "";
@@ -15,8 +17,24 @@ class ParticleGroup {
     this.angle = [0, 0, 0];
     this.angleSpeed = [0, 0, 0];
     this.angleAcc = [0, 0, 0];
-    this.randomMove = 0;
-    this.randomAngle = 0;
+    this.angleRandom = [0, 0, 0];
+    this._texture = "";
+    this.material = new THREE.MeshBasicMaterial({
+      side: THREE.DoubleSide,
+      transparent: true
+    });
+  }
+
+  set texture(value) {
+    this._texture = value;
+    let tex = textureLoader.load(value);
+    if (this.material.map) this.material.map.dispose();
+    this.material.map = tex;
+    this.material.needsUpdate = true;
+  }
+
+  get texture() {
+    return this._texture;
   }
 
   export() {
@@ -30,8 +48,9 @@ class ParticleGroup {
       angle: this.angle,
       angleSpeed: this.angleSpeed,
       angleAcc: this.angleAcc,
-      randomAngle: this.randomAngle,
-      randomMove: this.randomMove
+      angleRandom: this.angleRandom,
+      randomMove: this.randomMove,
+      texture: this.texture
     }
   }
 
@@ -45,8 +64,12 @@ class ParticleGroup {
     if ("angle" in data) this.angle = data.angle;
     if ("angleSpeed" in data) this.angleSpeed = data.angleSpeed;
     if ("angleAcc" in data) this.angleAcc = data.angleAcc;
-    if ("randomAngle" in data) this.randomAngle = data.randomAngle;
-    if ("randomMove" in data) this.randomMove = data.randomMove;
+    if ("angleRandom" in data) this.angleRandom = data.angleRandom;
+    if ("texture" in data) this.texture = data.texture;
+  }
+
+  dispose() {
+    this.material.dispose();
   }
 
 }

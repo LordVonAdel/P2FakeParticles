@@ -12,9 +12,7 @@
     "electron": "^8.2.3"
   },
   "dependencies": {
-    "pngjs": "^5.0.0",
     "source-smd": "0.0.4",
-    "three": "^0.115.0",
-    "vtf": "0.0.3"
+    "three": "^0.115.0"
   }
 }

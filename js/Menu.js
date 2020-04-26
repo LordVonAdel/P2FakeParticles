@@ -30,6 +30,12 @@ module.exports = function(window, showLibs) {
             window.webContents.send("export");
           }
         },
+        {
+          label: "Compile",
+          click() {
+            window.webContents.send("compile");
+          }
+        },
         { type: 'separator' },
         { role: 'quit' },
       ]

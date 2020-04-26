@@ -19,6 +19,18 @@
         <div id="group-tools"></div>
       </div>
       <div class="preview" id="preview"></div>
+      <div class="popup" id="compile-popup">
+        <h3>Export to game</h3>
+        Select your game folder. (Where <b>gameinfo.txt</b> lives)
+        <div>
+          <button id="compile-select">Select Folder</button>
+        </div>
+        <div>
+          <label id="gamefolder-path" for="compile-select"></label>
+        </div>
+        <button id="compile-start">Compile</button>
+        <button id="compile-cancel">Cancel</button>
+      </div>
       <div id="log-view"></div>
     </div>
     <script>
@@ -26,7 +38,7 @@
         if (e.key == "F12") {
           require('electron').remote.getCurrentWindow().toggleDevTools();
         }
-      })
+      });
 
       const Editor = require("./js/Editor.js");
       const Preview = require("./js/Preview.js");
@@ -34,7 +46,6 @@
       let editor = new Editor();
       new Preview(editor);
       editor.newDefinition();
-
     </script>
   </body>
 </html>

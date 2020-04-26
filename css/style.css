@@ -8,13 +8,33 @@ body {
   margin: 0px;
   overflow: hidden;
   color: white;
-  background-color: #202020;
+  background-color: #101010;
   user-select: none;
 }
 
 input {
   display: block;
   width: 100%;
+  border: none;
+  box-shadow: inset 2px 2px 4px rgba(0, 0, 0, 0.4);
+  background-color: rgba(0, 0, 0, 0.4);
+  color: white;
+  padding: 8px;
+}
+
+button {
+  display: block;
+  width: 100%;
+  border: none;
+  box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.4);
+  background: linear-gradient(180deg, #202020 0%, #303030 100%);
+  color: white;
+  padding: 8px;
+  margin: 2px;
+}
+
+button:hover {
+  background: linear-gradient(180deg, #303030, #353535 100%);
 }
 
 .main {
@@ -29,7 +49,6 @@ input {
 .tools, .preview {
   height: 100%;
   margin: 0px;
-  background: #202020;
   padding: 3px;
   display: inline-block;
   position: absolute;
@@ -42,6 +61,7 @@ input {
   height: 100%;
   padding: 5px;
   overflow-y: auto;
+  overflow-x: hidden;
 }
 
 .preview {
@@ -64,7 +84,7 @@ label {
 }
 
 .group-item {
-  padding: 3px;
+  padding: 4px;
   cursor: pointer;
 }
 
@@ -73,7 +93,22 @@ label {
 }
 
 .group-item.selected {
-  background: rgba(255, 255, 255, 0.4);
+  background: rgba(255, 0, 255, 0.4);
+}
+
+.popup {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  display: none;
+  padding: 10px;
+  background: #101010;
+  border: 1px solid black;
+  width: 400px;
+  height: 200px;
+  margin-left: -200px;
+  margin-top: -100px;
+  box-shadow: 5px 5px 5px rgba(0, 0, 0, 0.2);
 }
 
 canvas:focus {
@@ -86,13 +121,14 @@ canvas:focus {
   top: 0px;
   left: 0px;
   right: 0px;
-  bottom: 0px;
+  bottom: -4px;
   background: rgba(0, 0, 0, 0.8);
   color: white;
   font-family: monospace;
   user-select: text;
   backdrop-filter: blur(4px);
   overflow: auto;
+  padding: 4px;
 }
 
 .log-title::before {

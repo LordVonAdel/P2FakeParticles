@@ -1,6 +1,7 @@
 const ParticleDefinition = require("./ParticleDefinition.js");
 const { ipcRenderer, remote } = require('electron');
 const fs = require("fs");
+const path = require("path");
 const Exporter = require('./Exporter.js');
 
 class Editor {
@@ -125,7 +126,7 @@ class Editor {
     });
 
     ipcRenderer.on("export", () => {
-      remote.dialog.showSaveDialog(remote.getCurrentWindow(), {
+      remote.dialog.showSaveDialog({
         title: "Export to SMD",
         filters: [
           { name: "JSON", extensions: ['smd'] }, // Portal 2 Fake Particle
@@ -135,6 +136,31 @@ class Editor {
         if (!filename) return;
         console.log("Exporting to ", filename);
         this.exporter.export(this.definition, filename);
+      });
+    });
+
+    ipcRenderer.on("compile", () => {
+      document.getElementById("compile-popup").style.display = "block";
+    });
+
+    document.getElementById("gamefolder-path").innerText = localStorage.getItem("gamefolder");
+
+    document.getElementById("compile-cancel").addEventListener("click", () => {
+      document.getElementById("compile-popup").style.display = "";
+    });
+
+    document.getElementById("compile-start").addEventListener("click", () => {
+      document.getElementById("compile-popup").style.display = "";
+      this.exporter.exportAndCompile(this.definition, localStorage.getItem("gamefolder"));
+    });
+
+    document.getElementById("compile-select").addEventListener("click", () => {
+      remote.dialog.showOpenDialog({
+        properties: ['openDirectory']
+      }).then(value => {
+        if (value.canceled || value.filePaths.length < 1) return;
+        localStorage.setItem("gamefolder", value.filePaths[0]);
+        document.getElementById("gamefolder-path").innerText = localStorage.getItem("gamefolder");
       });
     });
 
@@ -305,6 +331,8 @@ class Editor {
     div2.innerText = text;
     div2.style.color = color;
     this.logDiv.appendChild(div2);
+    this.logDiv.scrollTo(0, this.logDiv.scrollHeight);
+    return div2;
   }
 
   closeCompileLog() {

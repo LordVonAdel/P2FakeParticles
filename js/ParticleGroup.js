@@ -21,7 +21,8 @@ class ParticleGroup {
     this._texture = "";
     this.material = new THREE.MeshBasicMaterial({
       side: THREE.DoubleSide,
-      transparent: true
+      transparent: true,
+      alphaTest: 0.1
     });
   }
 

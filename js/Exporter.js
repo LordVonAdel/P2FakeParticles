@@ -13,6 +13,11 @@ class Exporter {
 
   constructor(editor) {
     this.editor = editor;
+
+    this.pathToVTFCmd = "./bin/VTFCmd.exe";
+    if (process.env.PORTABLE_EXECUTABLE_DIR) {
+      this.pathToVTFCmd = path.join(process.env.PORTABLE_EXECUTABLE_DIR, this.pathToVTFCmd);
+    }
   }
 
   /**
@@ -250,7 +255,7 @@ class Exporter {
       }));
 
       promises.push(new Promise((resolve, reject) => {
-        execFile("./bin/VTFCmd.exe", [
+        execFile(this.pathToVTFCmd, [
           "-file", group.texture,
           "-output", outDirectory,
           "-alphaformat", "RGBA8888",

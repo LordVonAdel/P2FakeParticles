@@ -46,4 +46,4 @@ This software is licensed under the GPL license.
 
 It uses VTFLib (GPL) and VTFCmd (LGPL).
 
-The example content is released under CC0 1.0 Universell
+The example content is released under CC0 1.0 Universal

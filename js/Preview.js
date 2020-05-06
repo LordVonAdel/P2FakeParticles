@@ -1,5 +1,6 @@
 const { ipcRenderer, remote } = require('electron');
 const Particle = require('./Particle.js');
+const info_player_start = require('./info_player_start.js');
 
 class Preview {
 
@@ -47,6 +48,8 @@ class Preview {
       this.camera.position.set(10, 10, 10); // Could have used saveState too. But naaah
       this.controls.update();
     });
+
+    info_player_start(this.scene);
 
     this.updateScene();
   }

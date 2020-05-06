@@ -1,4 +1,5 @@
 const textureLoader = new THREE.TextureLoader();
+const Path = require("path");
 
 class ParticleGroup {
 
@@ -27,6 +28,9 @@ class ParticleGroup {
   }
 
   set texture(value) {
+    if (!Path.isAbsolute(value)) {
+      value = Path.join(process.env.PORTABLE_EXECUTABLE_DIR, value);
+    }
     this._texture = value;
     let tex = textureLoader.load(value);
     if (this.material.map) this.material.map.dispose();

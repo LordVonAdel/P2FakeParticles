@@ -104,8 +104,9 @@ class Editor {
           { name: "JSON", extensions: ['p2fp'] }, // Portal 2 Fake Particle
         ],
         defaultPath: this.definition.name
-      }, filename => {
-        if (!filename) return;
+      }).then(files => {
+        if (files.canceled) return;
+        let filename = files.filePath[0];
         console.log("Saving at ", filename);
         fs.writeFile(filename, JSON.stringify(this.definition.export()), (err) => {
           if (err) alert("Saving failed."); // Don't give more information. Like valve would do
@@ -119,9 +120,9 @@ class Editor {
         filters: [
           { name: "JSON", extensions: ['p2fp'] },
         ]
-      }, filename => {
-        if (!filename || filename.length == 0) return;
-        this.openP2fp(filename[0]);
+      }).then(files => {
+        if (files.canceled) return;
+        this.openP2fp(files.filePaths[0]);
       });
     });
 
@@ -132,8 +133,9 @@ class Editor {
           { name: "JSON", extensions: ['smd'] }, // Portal 2 Fake Particle
         ],
         defaultPath: this.definition.name
-      }, filename => {
-        if (!filename) return;
+      }).then(files => {
+        if (files.canceled) return;
+        let filename = files.filePath[0];
         console.log("Exporting to ", filename);
         this.exporter.export(this.definition, filename);
       });
@@ -309,9 +311,10 @@ class Editor {
       filters: [
         { name: "PNG", extensions: ['png'] },
       ]
-    }, filename => {
-      if (!filename || filename.length == 0) return;
-      this.selectedGroup.texture = filename[0];
+    }).then(files => {
+      if (files.canceled) return;
+      let filename = files.filePaths[0];
+      this.selectedGroup.texture = filename;
       this.preview.updateScene();
     });
   }

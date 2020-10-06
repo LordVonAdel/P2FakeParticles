@@ -9,7 +9,7 @@
   "author": "LordVonAdel",
   "license": "GPL",
   "devDependencies": {
-    "electron": "^8.2.3"
+    "electron": "^8.5.2"
   },
   "dependencies": {
     "source-smd": "0.0.4",

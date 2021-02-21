@@ -1,3 +1,7 @@
+# DEPRECATED
+Since Update February 18, 2021 of Portal 2, particles can now be packed into workshop levels.
+
+--------------------------------
 # Portal 2 Fake Particle Creator
 
 This is a (WIP) tool that bakes particles into models for use in the source engine. It was created for Portal 2 but should work with other games too.
